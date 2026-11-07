@@ -1,0 +1,360 @@
+/*
+ * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
+ * Click nbfs://nbhost/SystemFileSystem/Templates/GUIForms/JFrame.java to edit this template
+ */
+package ui;
+
+import controller.TaskController;
+import javax.swing.JOptionPane;
+import javax.swing.ListSelectionModel;
+
+/**
+ *
+ * @author admin
+ */
+public class MainForm extends javax.swing.JFrame {
+    
+    private static final java.util.logging.Logger logger = java.util.logging.Logger.getLogger(MainForm.class.getName());
+    private TaskController controller;
+    private final TaskTableModel tableModel = new TaskTableModel();
+    private String selectedChildID;
+
+    /**
+     * Creates new form MainForm
+     */
+    public MainForm() {
+        initComponents();
+        initializeTable();
+    }
+
+    public MainForm(TaskController controller) {
+        this();
+        this.controller = controller;
+        connectActions();
+        refreshTaskList();
+    }
+
+    private void initializeTable() {
+        jTableListOfTask.setModel(tableModel);
+        jTableListOfTask.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+        jTableListOfTask.getSelectionModel().addListSelectionListener(event -> {
+            if (!event.getValueIsAdjusting()) loadSelectedRecord();
+        });
+    }
+
+    private void connectActions() {
+        jButtonSave.addActionListener(event -> saveRecord());
+        jButtonDelete.addActionListener(event -> deleteRecord());
+    }
+
+    public void refreshTaskList() {
+        if (controller != null) tableModel.setTasks(controller.getAllTask());
+    }
+
+    private void saveRecord() {
+        if (controller == null) return;
+        String name = jTextFieldName.getText();
+        String age = jTextFieldAge.getText();
+        String barangay = jTextFieldBarangay.getText();
+        String vaccine = jTextFieldVaccine.getText();
+        boolean success;
+        if (selectedChildID == null) {
+            success = controller.handleAddTask(name, age, barangay, vaccine);
+        } else {
+            success = controller.handleUpdateTask(selectedChildID, name, age, barangay, vaccine);
+        }
+        if (success) {
+            JOptionPane.showMessageDialog(this, selectedChildID == null ? "Record saved successfully." : "Record updated successfully.");
+            clearFields();
+        } else {
+            JOptionPane.showMessageDialog(this, "Please complete all fields and try again.", "Unable to save", JOptionPane.WARNING_MESSAGE);
+        }
+    }
+
+    private void deleteRecord() {
+        if (controller == null || selectedChildID == null) {
+            JOptionPane.showMessageDialog(this, "Please select a record to delete.");
+            return;
+        }
+        int answer = JOptionPane.showConfirmDialog(this, "Delete the selected record?", "Confirm delete", JOptionPane.YES_NO_OPTION);
+        if (answer == JOptionPane.YES_OPTION && controller.handleDeleteTask(selectedChildID)) {
+            clearFields();
+            JOptionPane.showMessageDialog(this, "Record deleted successfully.");
+        }
+    }
+
+    private void loadSelectedRecord() {
+        int row = jTableListOfTask.getSelectedRow();
+        if (row < 0 || controller == null) return;
+        int modelRow = jTableListOfTask.convertRowIndexToModel(row);
+        selectedChildID = tableModel.getTaskId(modelRow);
+        model.Task task = controller.getTaskDetails(selectedChildID);
+        if (task != null) {
+            jTextFieldName.setText(task.getName());
+            jTextFieldAge.setText(task.getAge());
+            jTextFieldBarangay.setText(task.getBarangay());
+            jTextFieldVaccine.setText(task.getVaccine_ID());
+        }
+    }
+
+    private void clearFields() {
+        selectedChildID = null;
+        jTextFieldName.setText("");
+        jTextFieldAge.setText("");
+        jTextFieldBarangay.setText("");
+        jTextFieldVaccine.setText("");
+        jTableListOfTask.clearSelection();
+    }
+    private void sortSelection() {
+
+    if (controller == null) {
+        JOptionPane.showMessageDialog(this,
+                "Controller is not initialized!");
+        return;
+    }
+
+    java.util.List<model.Task> tasks =
+            new java.util.ArrayList<>(controller.getAllTask());
+
+    for (int i = 0; i < tasks.size() - 1; i++) {
+
+        int min = i;
+
+        for (int j = i + 1; j < tasks.size(); j++) {
+
+            if (tasks.get(j).getName().compareToIgnoreCase(
+                    tasks.get(min).getName()) < 0) {
+                min = j;
+            }
+        }
+
+        model.Task temp = tasks.get(i);
+        tasks.set(i, tasks.get(min));
+        tasks.set(min, temp);
+    }
+
+    tableModel.setTasks(tasks);
+
+    JOptionPane.showMessageDialog(this,
+            "Records sorted alphabetically using Selection Sort!");
+}
+
+    /**
+     * This method is called from within the constructor to initialize the form.
+     * WARNING: Do NOT modify this code. The content of this method is always
+     * regenerated by the Form Editor.
+     */
+    @SuppressWarnings("unchecked")
+    // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
+    private void initComponents() {
+
+        jLayeredPane1 = new javax.swing.JLayeredPane();
+        jPanel1 = new javax.swing.JPanel();
+        jLabel1 = new javax.swing.JLabel();
+        jLabel2 = new javax.swing.JLabel();
+        jLabel3 = new javax.swing.JLabel();
+        jTextFieldName = new javax.swing.JTextField();
+        jLabel4 = new javax.swing.JLabel();
+        jTextFieldAge = new javax.swing.JTextField();
+        jLabel5 = new javax.swing.JLabel();
+        jTextFieldBarangay = new javax.swing.JTextField();
+        jLabel6 = new javax.swing.JLabel();
+        jTextFieldVaccine = new javax.swing.JTextField();
+        jButtonSave = new javax.swing.JButton();
+        jButtonDelete = new javax.swing.JButton();
+        jButton1 = new javax.swing.JButton();
+        jScrollPane1 = new javax.swing.JScrollPane();
+        jTableListOfTask = new javax.swing.JTable();
+
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+
+        jLabel1.setForeground(new java.awt.Color(51, 51, 255));
+        jLabel1.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel1.setText("CHILD VACCINATION SYSTEM");
+
+        jLabel2.setHorizontalAlignment(javax.swing.SwingConstants.CENTER);
+        jLabel2.setText("Child Immunization Track");
+
+        jLabel3.setText("Name: ");
+
+        jLabel4.setText("Age:");
+
+        jLabel5.setText("Barangay:");
+
+        jLabel6.setText("Vaccine-Id:");
+
+        jButtonSave.setText("Save");
+
+        jButtonDelete.setText("Delete");
+
+        jButton1.setText("sort");
+        jButton1.addActionListener(this::jButton1ActionPerformed);
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
+                        .addContainerGap()
+                        .addComponent(jLabel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addGap(315, 315, 315)
+                                .addComponent(jLabel2, javax.swing.GroupLayout.PREFERRED_SIZE, 244, javax.swing.GroupLayout.PREFERRED_SIZE))
+                            .addGroup(jPanel1Layout.createSequentialGroup()
+                                .addContainerGap()
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextFieldAge, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addGap(35, 35, 35)
+                                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextFieldVaccine, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE))
+                                    .addGroup(jPanel1Layout.createSequentialGroup()
+                                        .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 65, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                        .addComponent(jTextFieldBarangay, javax.swing.GroupLayout.PREFERRED_SIZE, 150, javax.swing.GroupLayout.PREFERRED_SIZE)))))
+                        .addGap(0, 336, Short.MAX_VALUE)))
+                .addContainerGap())
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGap(54, 54, 54)
+                .addComponent(jButtonSave)
+                .addGap(51, 51, 51)
+                .addComponent(jButtonDelete)
+                .addGap(270, 270, 270)
+                .addComponent(jButton1)
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(jLabel1, javax.swing.GroupLayout.PREFERRED_SIZE, 40, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addGroup(jPanel1Layout.createSequentialGroup()
+                        .addComponent(jLabel2)
+                        .addGap(18, 18, 18)
+                        .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextFieldName, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jLabel5, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(jTextFieldBarangay, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jLabel4, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE))
+                    .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                        .addComponent(jTextFieldAge, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addComponent(jTextFieldVaccine, javax.swing.GroupLayout.PREFERRED_SIZE, 28, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                .addGap(18, 18, 18)
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                    .addComponent(jButtonSave)
+                    .addComponent(jButtonDelete)
+                    .addComponent(jButton1))
+                .addContainerGap(29, Short.MAX_VALUE))
+        );
+
+        jTableListOfTask.setModel(new javax.swing.table.DefaultTableModel(
+            new Object [][] {
+                {},
+                {},
+                {},
+                {}
+            },
+            new String [] {
+
+            }
+        ));
+        jScrollPane1.setViewportView(jTableListOfTask);
+
+        jLayeredPane1.setLayer(jPanel1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+        jLayeredPane1.setLayer(jScrollPane1, javax.swing.JLayeredPane.DEFAULT_LAYER);
+
+        javax.swing.GroupLayout jLayeredPane1Layout = new javax.swing.GroupLayout(jLayeredPane1);
+        jLayeredPane1.setLayout(jLayeredPane1Layout);
+        jLayeredPane1Layout.setHorizontalGroup(
+            jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.Alignment.TRAILING)
+        );
+        jLayeredPane1Layout.setVerticalGroup(
+            jLayeredPane1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jLayeredPane1Layout.createSequentialGroup()
+                .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 421, Short.MAX_VALUE))
+        );
+
+        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
+        getContentPane().setLayout(layout);
+        layout.setHorizontalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLayeredPane1)
+        );
+        layout.setVerticalGroup(
+            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addComponent(jLayeredPane1)
+        );
+
+        pack();
+    }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    sortSelection();
+    }//GEN-LAST:event_jButton1ActionPerformed
+
+    /**
+     * @param args the command line arguments
+     */
+    public static void main(String args[]) {
+        /* Set the Nimbus look and feel */
+        //<editor-fold defaultstate="collapsed" desc=" Look and feel setting code (optional) ">
+        /* If Nimbus (introduced in Java SE 6) is not available, stay with the default look and feel.
+         * For details see http://download.oracle.com/javase/tutorial/uiswing/lookandfeel/plaf.html 
+         */
+        try {
+            for (javax.swing.UIManager.LookAndFeelInfo info : javax.swing.UIManager.getInstalledLookAndFeels()) {
+                if ("Nimbus".equals(info.getName())) {
+                    javax.swing.UIManager.setLookAndFeel(info.getClassName());
+                    break;
+                }
+            }
+        } catch (ReflectiveOperationException | javax.swing.UnsupportedLookAndFeelException ex) {
+            logger.log(java.util.logging.Level.SEVERE, null, ex);
+        }
+        //</editor-fold>
+
+        /* Create and display the form */
+        java.awt.EventQueue.invokeLater(() -> new MainForm().setVisible(true));
+    }
+
+    // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButtonDelete;
+    private javax.swing.JButton jButtonSave;
+    private javax.swing.JLabel jLabel1;
+    private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
+    private javax.swing.JLabel jLabel5;
+    private javax.swing.JLabel jLabel6;
+    private javax.swing.JLayeredPane jLayeredPane1;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JScrollPane jScrollPane1;
+    private javax.swing.JTable jTableListOfTask;
+    private javax.swing.JTextField jTextFieldAge;
+    private javax.swing.JTextField jTextFieldBarangay;
+    private javax.swing.JTextField jTextFieldName;
+    private javax.swing.JTextField jTextFieldVaccine;
+    // End of variables declaration//GEN-END:variables
+}
